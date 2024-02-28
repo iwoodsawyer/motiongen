@@ -15,7 +15,7 @@
 
   %<LibAddToModelSources("brake")>
   %<LibAddToModelSources("position_first_step1")>
-  %<LibAddToModelSources("position_first_step2.")>
+  %<LibAddToModelSources("position_first_step2")>
   %<LibAddToModelSources("position_second_step1")>
   %<LibAddToModelSources("position_second_step2")>
   %<LibAddToModelSources("position_third_step1")>
@@ -44,7 +44,7 @@
     %% start and every time an enabled subsystem is re-enabled.
 
     %% Reset the IWork flag to 1 when values need to be reinitialized.
-    %<LibBlockPWork(BlockInit, "", "", 0)> = 1;
+    %<LibBlockIWork(BlockInit, "", "", 0)> = 1;
   }
 %endfunction
 
@@ -62,7 +62,7 @@
     auto *IP  = new ruckig::InputParameter<ruckig::DynamicDOFs>( ndofs );
     auto *OP  = new ruckig::OutputParameter<ruckig::DynamicDOFs>( ndofs );
     
-    const char* control = %<SFcnParamSettings.ControlInterface>;
+    const char* control = "%<SFcnParamSettings.ControlInterface>";
     if (strcmp(control,"POSITION") == 0){
         IP->control_interface = ruckig::ControlInterface::Position;
     }
@@ -73,7 +73,7 @@
         IP->control_interface = ruckig::ControlInterface::Position;
     }
     
-    const char* sync = %<SFcnParamSettings.Synchronization>;
+    const char* sync = "%<SFcnParamSettings.Synchronization>";
     if (strcmp(sync,"NO_SYNCHRONIZATION") == 0){
         IP->synchronization = ruckig::Synchronization::None;
     }
@@ -90,7 +90,7 @@
         IP->synchronization = ruckig::Synchronization::Time;
     }
     
-    const char* duration = %<SFcnParamSettings.DurationDiscretization>;
+    const char* duration = "%<SFcnParamSettings.DurationDiscretization>";
     if (strcmp(duration,"CONTINUOUS") == 0){
         IP->duration_discretization = ruckig::DurationDiscretization::Continuous;
     }
@@ -116,7 +116,7 @@
   /* %<Type> Block: %<Name> */
   {
     %% Initialize values if the IWork vector flag is true. 
-    if (%<LibBlockPWork(BlockInit, "", "", 0)> == 1) {
+    if (%<LibBlockIWork(BlockInit, "", "", 0)> == 1) {
         const int_T ndofs = static_cast<int_T>(%<SFcnParamSettings.NumberOfDoFs>);
         for (int_T dof=0; dof < ndofs; dof++)
         {
@@ -125,11 +125,11 @@
             (%<LibBlockOutputSignalAddr(2, "", "", 0)>)[dof] = (%<LibBlockInputSignalAddr(5, "", "", 0)>)[dof];
         }
 
-        %<LibBlockPWork(BlockInit, "", "", 0)> = 0;
+        %<LibBlockIWork(BlockInit, "", "", 0)> = 0;
     }
     else {
         %% Retrieve C++ object from the pointers vector
-        auto *OP = static_cast<ruckig::OutputParameter<ruckig::DynamicDOFs> *>(%<LibBlockPWork(RMLPositionOutputParameters, "", "", 0)>);
+        auto *OP = static_cast<ruckig::OutputParameter<ruckig::DynamicDOFs> *>(%<LibBlockPWork(OutputParameter, "", "", 0)>);
     
         const int_T ndofs = static_cast<int_T>(%<SFcnParamSettings.NumberOfDoFs>);
         for (int_T dof=0; dof < ndofs; dof++)
